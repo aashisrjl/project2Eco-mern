@@ -1,0 +1,42 @@
+// its only for fixing bug in vscode its not for production later
+for typescript 
+in backend we use ts as a dev dependencies so 
+npm install "--save-dev typescript"
+// for nodejs in express we have to install a diff package for types of ts
+npm install --save-dev @types/express
+// for node also 
+npm install --save-dev @types/node
+// for typescript config file
+npx --init tsc
+
+
+// we create a src folder to write a ts code 
+in ts config file set
+rootDir = "src"
+// we create a build folder for store ts code in js form 
+outDir = "build"
+
+// to convert src ko ts file to js in build folder 
+npx tsc
+// for running both command 
+"start":"npx tsc && node build/app.js" instead of this its better to 
+npm i tsc-node 
+
+//database
+npm i sequelize
+npm i mysql2
+npm i --save-dev @types/sequelize
+
+//rimraf is for delete the specified folder and file
+  "build":"rimraf ./build && tsc" 
+  // build a nodemon.json file for starting after saving the code 
+  {
+    "watch": ["src"],
+    "ext": ".ts,.js",
+    "ignore":[],
+    "exec":"npx ts-node ./src/app.ts"
+}and
+"scripts": {
+    "start": "npx nodemon",
+    "build":"rimraf ./build && tsc" 
+}
