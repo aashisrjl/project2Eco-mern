@@ -40,3 +40,10 @@ npm i --save-dev @types/sequelize
     "start": "npx nodemon",
     "build":"rimraf ./build && tsc" 
 }
+
+// for a better security 
+we use .env and g=ignore it 
+to connect databse through .env file we have to use package
+npm i dotenv
+npm i sequelize-typescript
+
