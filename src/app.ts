@@ -2,22 +2,17 @@ import express,{Application,Request,Response} from 'express';// types of express
 const app:Application = express()
 const port:number = 3000
 
+app.use(express.urlencoded())
+app.use(express.json())
+
 import * as dotenv from 'dotenv'
 dotenv.config()
 import "./database/connection"
 
+// import userRouter
+import userRoute from './routes/userRoute';
 
-app.get("/",(req:Request,res:Response)=>{
-    res.send("Hello World")
-})
-
-app.get("/about",(req:Request,res:Response)=>{
-    res.send("This is about page")
-})
-
-app.get("/contact",(req:Request,res:Response)=>{
-    res.send("This is contact page")
-});
+app.use("/",userRoute   )
 
 app.listen(port,()=>{
     console.log("Server is running on port: "+port)
