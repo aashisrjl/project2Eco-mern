@@ -6,7 +6,7 @@ import {
     CreatedAt
 
 } from 'sequelize-typescript';
-import { defaultValueSchemable } from 'sequelize/types/utils';
+
 
 @Table({
     tableName: "users",
@@ -27,7 +27,7 @@ class User extends Model{
 
     })
     declare username:string;
-    
+
     @Column({
         type: DataType.ENUM('customer','admin'),
         defaultValue: 'customer'

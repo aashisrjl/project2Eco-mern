@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';
 
 class AuthController{
    public static async registerUser(req:Request,res:Response):Promise<void>{
-    try{
+    // try{
         const {username,role,email,password} = req.body;
         if(!username || !email || !password){
             res.status(400).json({
@@ -26,15 +26,15 @@ class AuthController{
                     message:"user created successfully",
                     user: user
                 });
-            }catch(err){
-                res.status(500).json({
-                    message: `server error,${err}`
-                })
-            }
+            // }catch(err){
+            //     res.status(500).json({
+            //         message: `server error,${err}`
+            //     })
+            // }
     }
-
+// login code 
     public static async loginUser(req:Request,res:Response):Promise<void>{
-        try{
+        // try{
         const {email,password} = req.body;
         if(!email || !password){
             res.status(400).json({
@@ -43,6 +43,7 @@ class AuthController{
             return;
         }
         const user = await User.findOne({where:{email}});
+        // check if the email is already registered
         if(!user){
             res.status(400).json({
                 message: "please register first"
@@ -70,11 +71,11 @@ class AuthController{
             token: token
         })
 
-        }catch(err){
-            res.status(500).json({
-                error: `server error: ${err}`
-            })
-        }
+        // }catch(err){
+        //     res.status(500).json({
+        //         error: `server error: ${err}`
+        //     })
+        // }
     }
 }
 export default AuthController;
