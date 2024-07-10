@@ -11,8 +11,12 @@ import "./database/connection"
 
 // import userRouter
 import userRoute from './routes/userRoute';
+import productRoute from './routes/productRoute';
+import adminSeeder from './adminSeeder';
+adminSeeder();
 
 app.use("",userRoute)
+app.use("/admin/product",productRoute)
 
 app.listen(port,()=>{
     console.log("Server is running on port: "+port)
