@@ -12,6 +12,7 @@ import "./database/connection"
 // import userRouter
 import userRoute from './routes/userRoute';
 import productRoute from './routes/productRoute';
+import categoryRoute from './routes/categoryRoute';
 import adminSeeder from './adminSeeder';
 import categoryController from './controllers/categoryController';
 adminSeeder();
@@ -19,6 +20,7 @@ categoryController.seedCategory();
 
 app.use("",userRoute)
 app.use("/admin/product",productRoute)
+app.use("/admin/category",categoryRoute)
 
 app.listen(port,()=>{
     console.log("Server is running on port: "+port)
