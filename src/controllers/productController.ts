@@ -3,6 +3,7 @@ import Product from "../database/models/productModel";
 import { AuthRequest } from "../middleware/AuthMiddleware";
 import User from "../database/models/userModel";
 import Category from "../database/models/categoryModel";
+import fs from 'fs';
 class productController {
     async addProduct(req:AuthRequest,res:Response):Promise<void>{
         const userId = req.user?.id;
@@ -79,7 +80,7 @@ class productController {
                 ]
         })
         if(!data){
-            res.status(400).json({
+            res.status(404).json({
                 message: "Single Product Not Found"
                 })
         }else{
@@ -90,5 +91,39 @@ class productController {
         }
     }
 
-}
+    async deleteProduct(req:AuthRequest,res:Response):Promise<void>{
+        const productId = req.params.id;
+        const data = await Product.findOne({
+            where:{id:productId}
+        })
+        const imageUrl = data?.productImageUrl;
+        console.log(imageUrl)
+
+        fs.unlink(`./src/uploads/${imageUrl}`,(err:any)=>{
+            if(err){
+                console.log(err)
+                }else{
+                    console.log("Image Deleted")
+                    }
+        })
+
+        if(!data){
+            res.status(404).json({
+                message: "Product Not Found"
+                })
+        }else{
+            await Product.destroy ({
+                where:{id:productId}
+            })
+            res.status(200).json({
+                message: "Product Deleted"
+                })
+                
+            }
+
+        }
+        
+        
+    }
+
 export default new productController();

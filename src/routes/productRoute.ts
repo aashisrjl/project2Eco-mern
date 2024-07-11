@@ -14,7 +14,11 @@ router.route("/").post(
 )
 .get(productController.getAllProducts)
 
-router.route("/:id").get(productController.getSingleProduct)
+router.route("/:id").get(catchAsyncError(productController.getSingleProduct))
+    .delete(
+        AuthMiddleware.isAuthenticated,
+        AuthMiddleware.restrictTo(Role.Admin),
+        catchAsyncError(productController.deleteProduct))
 
 
 export default router;
