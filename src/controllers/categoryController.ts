@@ -1,6 +1,7 @@
 import { Request,Response } from 'express';
 import Category from '../database/models/categoryModel';
 class CategoryController{
+    // already define the category
     categoryData = [
         {
             categoryName: "Electronics"
@@ -12,6 +13,7 @@ class CategoryController{
             categoryName: "Food"
         }
     ]
+    //category seeding
     async seedCategory():Promise<void>{
         const CategoryData = await Category.findAll();
         if(CategoryData.length ===0){
@@ -22,7 +24,7 @@ class CategoryController{
         }
 
     }
-
+    //add category
     async addCategory(req:Request,res:Response):Promise<void>{
         const {categoryName} = req.body;
         if(!categoryName){
@@ -39,7 +41,7 @@ class CategoryController{
             data
             })
     }
-
+    //get all category
     async getCategory(req:Request,res:Response):Promise<void>{
         const data = await Category.findAll();
         res.status(200).json({
@@ -47,7 +49,7 @@ class CategoryController{
             data
             })
     }
-
+    //delete category
     async deleteCategory(req:Request,res:Response):Promise<void>{
         const {id} = req.params;
         const data = await Category.findOne({where: {id:id}});
@@ -65,7 +67,7 @@ class CategoryController{
                 })
         }
     }
-
+    //update category
     async updateCategory(req:Request,res:Response):Promise<void>{
         const {id} = req.params;
         const {categoryName} = req.body;

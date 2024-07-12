@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize-typescript';
 import User from './models/userModel';
 import Product from './models/productModel';
 import Category from './models/categoryModel';
+import Cart from './models/cartModel';
 
 const sequelize = new Sequelize({
     database: process.env.DB_NAME || '',
@@ -33,5 +34,13 @@ sequelize.sync({ force: false })
     //product and category
     Category.hasOne(Product,{foreignKey: 'categoryId'});
     Product.belongsTo(Category,{foreignKey:'categoryId'});
+
+    // product cart relation
+    Product.hasMany(Cart,{foreignKey: "productId"});
+    Cart.belongsTo(Product,{foreignKey: "productId"});
+
+    // cart user relation
+    User.hasMany(Cart,{foreignKey: "userId"});
+    Cart.belongsTo(User,{foreignKey: "userId"});
 
 export default sequelize;
