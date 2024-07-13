@@ -4,6 +4,16 @@ import { AuthRequest } from '../middleware/AuthMiddleware';
 import Product from '../database/models/productModel';
 import Category from '../database/models/categoryModel';
 
+// interface CartData {
+//     id: string | null,
+//     quantity:number | null,
+//     createdAt:string | null,
+//     updatedAt:string | null,
+//     userId:string | null,
+//     productId:string | null
+
+// }
+
 class cartController{
     // add to cart
     async addToCart(req:AuthRequest,res:Response):Promise<void>{
@@ -54,13 +64,15 @@ class cartController{
                     include:[
                         {
                             model:Product,
+                            attributes:['productName','productDescription','productImageUrl','productPrice'],
                             include:[
                                 {
                                     model: Category
                                 }
                             ]
                         }
-                    ]
+                    ],
+                    attributes:['productId','quantity']
                 })
                 res.status(200).json({
                     message:"cart items fetch successfully",
@@ -77,34 +89,51 @@ class cartController{
     async deleteCartItem(req:AuthRequest,res:Response):Promise<void>{
         const productId = req.params.id;
         const userId = req.user?.id;
-        const data = Cart.findOne({where:{productId,userId}});
-        if(!data){
+        // check for product
+        const product = Product.findByPk(productId);
+        if(!product){
             res.status(404).json({
                 message:"this user have not cart items"
                 })
-        }else{
+                return;
+        }
+        //delete
             await Cart.destroy({where:{productId,userId}})
             res.status(200).json({
                 message:"cart item deleted successfully"
                 })
-        }
+        
     }
     //update cartItem
     async updateCartItem(req:AuthRequest,res:Response):Promise<void>{
     const userId = req.user?.id;
     const {quantity} = req.body;
     const productId = req.params.id;
-    const data = Cart.findOne({where:{productId,userId}});
-    if(!data){
+    if(!quantity){
+        res.status(400).json({
+            message: "please enter quantity"
+        })
+        return;
+    }
+    const cart = await Cart.findOne({
+        where:{
+            productId,
+            userId
+        }
+    })
+    if(cart){ 
+    cart.quantity = quantity
+    await cart?.save();
+    res.status(200).json({
+        message:"cart item updated successfully",
+        data: cart
+        })
+    }else{
         res.status(404).json({
             message:"this user have not cart items"
             })
-            }else{
-                await Cart.update({quantity:quantity},{where:{productId,userId}})
-                res.status(200).json({
-                    message:"cart item updated successfully"
-                    })
-                    }
+    }
+  
 
     }
 }
