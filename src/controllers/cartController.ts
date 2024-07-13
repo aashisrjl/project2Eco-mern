@@ -2,6 +2,7 @@ import {Request,Response} from 'express';
 import Cart from '../database/models/cartModel';
 import { AuthRequest } from '../middleware/AuthMiddleware';
 import Product from '../database/models/productModel';
+import Category from '../database/models/categoryModel';
 
 class cartController{
     // add to cart
@@ -52,7 +53,12 @@ class cartController{
                 },
                     include:[
                         {
-                            model:Product
+                            model:Product,
+                            include:[
+                                {
+                                    model: Category
+                                }
+                            ]
                         }
                     ]
                 })
@@ -66,6 +72,40 @@ class cartController{
                             })
                             return;
                     }
+    }
+    // delete a cart
+    async deleteCartItem(req:AuthRequest,res:Response):Promise<void>{
+        const productId = req.params.id;
+        const userId = req.user?.id;
+        const data = Cart.findOne({where:{productId,userId}});
+        if(!data){
+            res.status(404).json({
+                message:"this user have not cart items"
+                })
+        }else{
+            await Cart.destroy({where:{productId,userId}})
+            res.status(200).json({
+                message:"cart item deleted successfully"
+                })
+        }
+    }
+    //update cartItem
+    async updateCartItem(req:AuthRequest,res:Response):Promise<void>{
+    const userId = req.user?.id;
+    const {quantity} = req.body;
+    const productId = req.params.id;
+    const data = Cart.findOne({where:{productId,userId}});
+    if(!data){
+        res.status(404).json({
+            message:"this user have not cart items"
+            })
+            }else{
+                await Cart.update({quantity:quantity},{where:{productId,userId}})
+                res.status(200).json({
+                    message:"cart item updated successfully"
+                    })
+                    }
+
     }
 }
 export default new cartController();
