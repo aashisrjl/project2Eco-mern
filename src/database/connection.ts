@@ -3,6 +3,9 @@ import User from './models/userModel';
 import Product from './models/productModel';
 import Category from './models/categoryModel';
 import Cart from './models/cartModel';
+import Order from './models/orderModel';
+import OrderDetail from './models/orderDetailModel';
+import Payment from './models/paymentModel';
 
 const sequelize = new Sequelize({
     database: process.env.DB_NAME || '',
@@ -27,7 +30,7 @@ sequelize.sync({ force: false })
         console.log("Database synced");
     });
 
-    // relationship
+    ////////////////////// relationship //////////////////////////////////////
     // user and product
     User.hasMany(Product,{foreignKey: 'userId'});
     Product.belongsTo(User,{foreignKey:'userId'});
@@ -42,5 +45,19 @@ sequelize.sync({ force: false })
     // cart user relation
     User.hasMany(Cart,{foreignKey: "userId"});
     Cart.belongsTo(User,{foreignKey: "userId"});
+
+    // order and order-detail relation
+    Order.hasMany(OrderDetail,{foreignKey:'orderId'})
+    OrderDetail.belongsTo(Order,{foreignKey:'orderId'})
+
+    // order-detail and product
+    Product.hasMany(OrderDetail,{foreignKey:'productId'})
+    OrderDetail.belongsTo(Product,{foreignKey:'productId'})
+
+    //order-payment relation
+    Payment.hasOne(Order,{foreignKey:'paymentId'})
+    Order.belongsTo(Payment,{foreignKey:'paymentId'})
+
+
 
 export default sequelize;
