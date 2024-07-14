@@ -58,6 +58,10 @@ sequelize.sync({ force: false })
     Payment.hasOne(Order,{foreignKey:'paymentId'})
     Order.belongsTo(Payment,{foreignKey:'paymentId'})
 
+    // Order-user relation
+    User.hasMany(Order,{foreignKey:'userId'});
+    Order.belongsTo(User,{foreignKey:'userId'});
+
 
 
 export default sequelize;
