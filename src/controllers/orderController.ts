@@ -1,6 +1,6 @@
 import {Request,Response} from 'express';
 import { AuthRequest } from "../middleware/AuthMiddleware";
-import { OrderData, paymentMethod } from '../types/orderTypes';
+import { KhaltiResponse, OrderData, PaymentMethod } from '../types/orderTypes';
 import Order from '../database/models/orderModel';
 import Payment from '../database/models/paymentModel';
 import OrderDetail from '../database/models/orderDetailModel';
@@ -17,24 +17,27 @@ class OrderController{
                 });
                 return;
         }
+      
+        const paymentData = await Payment.create({
+            paymentMethod: paymentDetails.paymentMethod
+        })
         const orderData = await Order.create({
             phoneNumber,
             shippingAddress,
             totalAmount,
-            userId
+            userId,
+            paymentId:paymentData.id
         })
 
-        const paymentData = await Payment.create({
-            paymentMethod: paymentDetails.paymentMethod
-        })
-
-        for(let i=0; i<items.length;i++){
-        await OrderDetail.create({
+        let responseOrderData;
+        for(var i=0; i<items.length;i++){
+            responseOrderData = await OrderDetail.create({
             quantity: items[i].quantity,
             productId: items[i].productId,
             orderId: orderData.id
         })
-        if(paymentDetails.paymentMethod === paymentMethod.Khalti ){
+    }
+        if(paymentDetails.paymentMethod === PaymentMethod.Khalti ){
             //khalti integration
             const data ={
                 return_url :"http://localhost:3000/success",
@@ -49,14 +52,20 @@ class OrderController{
                     "Authorization": "Key dbae3da99710442a83d9068ff967b2ed"
                 }
             })
-            console.log(response)
+            const KhaltiResponse:KhaltiResponse = response.data;
+            paymentData.pidx = KhaltiResponse.pidx;
+            paymentData.save();
+            res.status(200).json({
+                message: "order placed success",
+                url: KhaltiResponse.payment_url
+            })
 
         }else{
             res.status(200).json({
                 message:"Order placed successfully"
             })
         }
-    }
+    
         
 
 
