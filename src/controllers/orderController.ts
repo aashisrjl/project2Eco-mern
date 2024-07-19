@@ -135,7 +135,7 @@ class OrderController{
 
     async fetchOrderDetails(req:AuthRequest,res:Response):Promise<void>{
         const userId= req.user?.id
-        const orderId = req.params.orderId
+        const orderId = req.params.id
         const order = await OrderDetail.findAll({
             where: {
                 orderId
@@ -160,7 +160,7 @@ class OrderController{
     }
     async cancelMyOrder(req:AuthRequest,res:Response):Promise<void>{
         const userId = req.user?.id
-        const orderId = req.params.orderId
+        const orderId = req.params.id
         const order:any = await Order.findAll({
             where: {
                 id:orderId,
@@ -189,25 +189,32 @@ class OrderController{
     //admin side
 
     async changeOrderStatus(req:Request,res:Response):Promise<void>{
+       try {
         const orderId = req.params.id
         const orderStatus:OrderStatus = req.body.orderStatus
+        console.log("*****************",orderStatus)
         if(!orderStatus){
             res.status(400).json({
                 message:"order status is required"
                 })
-                return
         }
          await Order.update({
-            orderStatus 
+            orderStatus
          },{
             where:{
-                orderId
+                id:orderId
             }
          })
          res.status(200).json({
             message:"order status changed successfully"
          })
 
+       } catch (error) {
+        res.status(500).json({
+            message:"something went wrong",
+            error
+        })
+       }
     }
 
     async changePaymentStatus(req:Request,res:Response):Promise<void>{
@@ -232,20 +239,23 @@ class OrderController{
         const order:any =await Order.findByPk(orderId)
         if(order){
             const paymentId = order.paymentId
+
+            await OrderDetail.destroy({
+                where:{
+                    orderId
+                }
+            })
+    
+            await Payment.destroy({
+                where:{
+                    id: paymentId
+                }
+            })      
+                 
         await Order.destroy({ where:{
             id:orderId
         }})
-        await OrderDetail.destroy({
-            where:{
-                orderId
-            }
-        })
-
-        await Payment.destroy({
-            where:{
-                id: paymentId
-            }
-        })
+        
         res.status(200).json({
             message:"order deleted successfully"
             })
