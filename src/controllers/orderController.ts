@@ -7,6 +7,9 @@ import OrderDetail from '../database/models/orderDetailModel';
 import axios from 'axios';
 import Product from '../database/models/productModel';
 
+class ExtendedOrder extends Order{
+    declare paymentId: string | null
+}
 class OrderController{
     async createOrder(req:AuthRequest,res:Response):Promise<void>{
         const userId = req.user?.id;
@@ -184,6 +187,74 @@ class OrderController{
     }
 
     //admin side
+
+    async changeOrderStatus(req:Request,res:Response):Promise<void>{
+        const orderId = req.params.id
+        const orderStatus:OrderStatus = req.body.orderStatus
+        if(!orderStatus){
+            res.status(400).json({
+                message:"order status is required"
+                })
+                return
+        }
+         await Order.update({
+            orderStatus 
+         },{
+            where:{
+                orderId
+            }
+         })
+         res.status(200).json({
+            message:"order status changed successfully"
+         })
+
+    }
+
+    async changePaymentStatus(req:Request,res:Response):Promise<void>{
+        const orderId = req.params.id
+        const paymentStatus:PaymentStatus = req.body.paymentStatus
+        const order:any = await Order.findByPk(orderId)
+        // const extendedOrder :ExtendedOrder = order as ExtendedOrder
+        await Payment.update({
+            paymentStatus
+        },{
+            where:{
+                id: order.paymentId
+            }
+        })
+        res.status(200).json({
+            message:`payment status of OrderId ${orderId} changed successfully to ${paymentStatus}`
+        })
+    }
+
+    async deleteOrder(req:Request,res:Response):Promise<void>{
+        const orderId = req.params.id
+        const order:any =await Order.findByPk(orderId)
+        if(order){
+            const paymentId = order.paymentId
+        await Order.destroy({ where:{
+            id:orderId
+        }})
+        await OrderDetail.destroy({
+            where:{
+                orderId
+            }
+        })
+
+        await Payment.destroy({
+            where:{
+                id: paymentId
+            }
+        })
+        res.status(200).json({
+            message:"order deleted successfully"
+            })
+        }else{
+            res.status(404).json({
+                message:"order not found"
+                })
+        }
+    }
 }
 
 
