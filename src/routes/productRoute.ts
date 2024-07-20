@@ -7,12 +7,14 @@ const router:Router = express.Router()
 import { upload } from "../middleware/multerMiddleware";
 import errorHandler from "../services/catchAsyncError";
 
+//add product by admin
 router.route("/").post(
     AuthMiddleware.isAuthenticated,
     AuthMiddleware.restrictTo(Role.Admin),
     upload.single('productImageUrl'),
     errorHandler(productController.addProduct)
 )
+// fetch all records
 .get(productController.getAllProducts)
 
 router.route("/:id").get(catchAsyncError(productController.getSingleProduct))
@@ -20,6 +22,7 @@ router.route("/:id").get(catchAsyncError(productController.getSingleProduct))
         AuthMiddleware.isAuthenticated,
         AuthMiddleware.restrictTo(Role.Admin),
         errorHandler(productController.deleteProduct))
+        // product update by admin
         .patch(
             AuthMiddleware.isAuthenticated,
             AuthMiddleware.restrictTo(Role.Admin),
