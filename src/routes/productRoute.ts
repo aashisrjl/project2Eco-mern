@@ -17,7 +17,9 @@ router.route("/").post(
 // fetch all records
 .get(productController.getAllProducts)
 
+//product get by user
 router.route("/:id").get(catchAsyncError(productController.getSingleProduct))
+//delete product by admin
     .delete(
         AuthMiddleware.isAuthenticated,
         AuthMiddleware.restrictTo(Role.Admin),
